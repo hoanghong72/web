@@ -1,137 +1,73 @@
+import formPage from '../pages/formPage'
 Cypress.on('uncaught:exception', (err, runnable) => {
-  // returning false here prevents Cypress from
-  // failing the test
-  return false
-});
-
-//hook event
-
-  beforeEach(() => {
+    // returning false here prevents Cypress from
+    // failing the test
+    return false
+  });
+beforeEach(() => {
     // runs before each test in the block
     cy.viewport(1280, 1100)
-    cy.visit('https://demoqa.com/automation-practice-form')
-  })
-// test Suite or test Scenario
-describe('Student successfully register', () => {
-  //test case
-  it('TC1', () => {
+    cy.visit('https://demoqa.com/automation-practice-form') 
     
-    cy.get('#firstName').type('Kha')
-    cy.get("#lastName").type('Hoai')
-    cy.get('[type="radio"]').check('Male',{ force: true })
-    cy.get('#userNumber').type('9825467895')
-    cy.get('#dateOfBirthInput').click()    
-    cy.get('.react-datepicker__month-select').select('February')
-    cy.get('.react-datepicker__year-select').select('2003')
-    cy.get('[role="option"]').contains('7').click()
-    cy.get('#submit').click()
-    cy.get('#example-modal-sizes-title-lg').should('have.text', 'Thanks for submitting the form')
+})
+
+describe('Student successfully register', () => {
+    //test case
+  it('TC1 - successfully register with valid values of required fields', () => {
+    const f = new formPage()
+    f.putRequiredFields('Kha','Hoai','Male','9825467895')
+    f.clickSubmit()
+    f.assertText(f.elements.dialogMessage,'Thanks for submitting the form')
   })
-  it('TC2', () => {    
-    cy.get('#firstName').type('Sa')
-    cy.get("#lastName").type('Ka')
-    cy.get('#userEmail').type('s@gmail.com')    
-    cy.get('[type="radio"]').check('Female',{ force: true })
-    cy.get('#userNumber').type('1234567890')
-    cy.get('#dateOfBirthInput').click()    
-    cy.get('.react-datepicker__month-select').select('June')
-    cy.get('.react-datepicker__year-select').select('1988')
-    cy.get('[role="option"]').contains('12').click()
-    cy.get('.subjects-auto-complete__value-container').type('m{enter}ch{enter}e{enter}')
-    cy.get('[type="checkbox"]').check('1',{ force: true })
-    cy.get('[type="checkbox"]').check('2',{ force: true })
-    cy.get('[type="checkbox"]').check('3',{ force: true })
-    cy.get('[type="checkbox"]').uncheck('1',{ force: true })
-    cy.get('#uploadPicture').selectFile('image1.png', { force: true })
-    cy.get('#currentAddress').type('12 AD street')
-    cy.get('.css-1hwfws3').contains('Select State').click()
-    cy.get('#react-select-3-option-1').click()
-    cy.get('.css-yk16xz-control').contains('Select City').click()
-    cy.get('#react-select-4-option-1').click()
-    cy.get('#submit').click()
-    cy.wait(100)
-    cy.get('#example-modal-sizes-title-lg').should('have.text', 'Thanks for submitting the form')
+  it('TC2 - ',() => {
+    const f = new formPage()
+    f.putRequiredFields('Linh','Nguyen','Female','9852314782')
+    f.putNotRequiredFields('nguyenkinh@gmail.com',['27','august','1998'],'m{enter}','12 AA street','2','1')
+    f.attachImage('image1.png')
+    f.clickSubmit()
+    f.assertText(f.elements.dialogMessage,'Thanks for submitting the form')
   })
 })
 
-describe('Student can not successfully register', () => {  
+describe('Student can not successfully register', () => {
   //test case
-  it('TC3 - with all empty fields', () => {    
-    cy.get('#submit').click()
-    //cy.wait(50000)
-    cy.get('#firstName').should('have.css','border-color','rgb(220, 53, 69)')
-    cy.get('#lastName').should('have.css','border-color','rgb(220, 53, 69)')
-    cy.get('[for="gender-radio-1"]').should('have.css','border-color','rgb(220, 53, 69)')
-    cy.get('#userNumber').should('have.css','border-color','rgb(220, 53, 69)')
+  it('TC3 - successfully register with empty values of all fields', () => {
+    const f = new formPage()  
+    f.clickSubmit()
+    f.assertBorderColor(f.elements.fristName,'rgb(220, 53, 69)')
+    f.assertBorderColor(f.elements.lastName,'rgb(220, 53, 69)')
+    f.assertBorderColor(f.elements.labelRadio,'rgb(220, 53, 69)')
+    f.assertBorderColor(f.elements.userNumber,'rgb(220, 53, 69)')
   })
-  it('TC4', () => {    
-    cy.get('#firstName').type('*Lin45')
-    cy.get("#lastName").type('2ho@i')
-    cy.get('#userEmail').type('ngan@com.123')    
-    cy.get('[type="radio"]').check('Other',{ force: true })
-    cy.get('#userNumber').type('0985a5741#')
-    cy.get('#dateOfBirthInput').click()    
-    cy.get('.react-datepicker__month-select').select('June')
-    cy.get('.react-datepicker__year-select').select('2024')
-    cy.get('[role="option"]').contains('25').click()
-    cy.get('.subjects-auto-complete__value-container').type('co{enter}')
-    cy.get('[type="checkbox"]').check('1',{ force: true })
-    cy.get('[type="checkbox"]').check('2',{ force: true })    
-    cy.get('#uploadPicture').selectFile('image1.png', { force: true })
-    cy.get('#currentAddress').type('123 D5 street')
-    cy.get('.css-1hwfws3').contains('Select State').click()
-    cy.get('#react-select-3-option-1').click()
-    cy.get('.css-yk16xz-control').contains('Select City').click()
-    cy.get('#react-select-4-option-1').click()
-    cy.get('#submit').click()  
-    cy.get('#userNumber').should('have.css','border-color','rgb(220, 53, 69)')
-    cy.get('#userEmail').should('have.css','border-color','rgb(220, 53, 69)')
-    cy.get('#firstName').should('have.css','border-color','rgb(220, 53, 69)')
-    cy.get('#lastName').should('have.css','border-color','rgb(220, 53, 69)')
-    cy.get('#dateOfBirthInput').should('have.css','border-color','rgb(220, 53, 69)')    
+  it('TC4 - FisrstName and LastName: "2hang$"; invalid Email format, Mobile Number: "4875#ak8999", DateofBirth > current date',() => {
+    const f = new formPage()
+    f.putRequiredFields('*Lin45','2ho@i','Other','0985a5741#')
+    f.putNotRequiredFields('ngan@com.123',['25','June','2024'],'co{enter}','123 D5 street','2','1')
+    f.attachImage('image1.png')
+    f.clickSubmit()
+    f.assertBorderColor(f.elements.email,'rgb(220, 53, 69)')
+    f.assertBorderColor(f.elements.userNumber,'rgb(220, 53, 69)')
+    f.assertBorderColor(f.elements.fristName,'rgb(220, 53, 69)')
+    f.assertBorderColor(f.elements.lastName,'rgb(220, 53, 69)')
+    f.assertBorderColor(f.elements.dateOfBirth,'rgb(220, 53, 69)')
   })
-  it('TC5', () => {    
-    cy.get('#firstName').type('Nguyen Dinh linh Sang Hoang Phuc Khang Anh Dieu Thuc')
-    cy.get("#lastName").type('Trinh Nguyen Dinh Vinh Sang Hoang Phuc Khang Anh Duc')
-    cy.get('#userEmail').type('nguyenlinh@gmail.com')    
-    cy.get('[type="radio"]').check('Other',{ force: true })
-    cy.get('#userNumber').type('985273147822893574')
-    cy.wait(2000)
-    cy.get('#dateOfBirthInput').click()    
-    cy.get('.react-datepicker__month-select').select('March')
-    cy.get('.react-datepicker__year-select').select('2005')
-    cy.get('[role="option"]').contains('2').click()
-    cy.get('.subjects-auto-complete__value-container').type('p{enter}')
-    cy.get('[type="checkbox"]').check('3',{ force: true })   
-    cy.get('#currentAddress').type('12 Harya stree')
-    cy.get('.css-1hwfws3').contains('Select State').click()
-    cy.get('#react-select-3-option-1').click()
-    cy.get('.css-yk16xz-control').contains('Select City').click()
-    cy.get('#react-select-4-option-1').click()
-    cy.get('#submit').click()  
-    cy.get('#userNumber').should('have.css','border-color','rgb(220, 53, 69)')
-    cy.get('#firstName').should('have.css','border-color','rgb(220, 53, 69)')
-    cy.get('#lastName').should('have.css','border-color','rgb(220, 53, 69)')       
+  it('TC5 - FisrstName and LastName: "2hang$"; invalid Email format, Mobile Number: "4875#ak8999", DateofBirth > current date',() => {
+    const f = new formPage()
+    const fristName = 'Nguyen Dinh linh Sang Hoang Phuc Khang Anh Dieu Thuc'
+    const lastName = 'Trinh Nguyen Dinh Vinh Sang Hoang Phuc Khang AnhDuc'
+    f.putRequiredFields(fristName,lastName,'Other','198123654789586')
+    f.putNotRequiredFields('nnguyenlinh@gmail.com',['2','March','2005'],'ph{enter}','12 Harya street','2','1')
+    f.attachImage('image1.png')
+    f.clickSubmit()  
+    f.assertBorderColor(f.elements.userNumber,'rgb(220, 53, 69)')
+    f.assertBorderColor(f.elements.fristName,'rgb(220, 53, 69)')
+    f.assertBorderColor(f.elements.lastName,'rgb(220, 53, 69)') 
   })
-  it('TC6 - Moblie Number < 10 digits', () => {    
-    cy.get('#firstName').type('Anh')
-    cy.get("#lastName").type('dinh')
-    cy.get('#userEmail').type('susu124@gmail.com')    
-    cy.get('[type="radio"]').check('Female',{ force: true })
-    cy.get('#userNumber').type('1286')
-    cy.get('#dateOfBirthInput').click()    
-    cy.get('.react-datepicker__month-select').select('December')
-    cy.get('.react-datepicker__year-select').select('2002')
-    cy.get('[role="option"]').contains('9').click()
-    cy.get('.subjects-auto-complete__value-container').type('co{enter}')
-    cy.get('[type="checkbox"]').check('1',{ force: true })
-    cy.get('[type="checkbox"]').check('2',{ force: true })
-    cy.get('#currentAddress').type('123 D5 street')
-    cy.get('.css-1hwfws3').contains('Select State').click()
-    cy.get('#react-select-3-option-1').click()
-    cy.get('.css-yk16xz-control').contains('Select City').click()
-    cy.get('#react-select-4-option-1').click()
-    cy.get('#submit').click()
-    cy.get('#userNumber').should('have.css','border-color','rgb(220, 53, 69)')     
+  it('TC6 - Mobile Number <10 digits',() => {
+    const f = new formPage()
+    f.putRequiredFields('anh','dinh','Female','1286')
+    f.putNotRequiredFields('susu124@gmail.com',['9','December','2002'],'m{enten}ph{enter}hi{enter}','12 Noida center','2','1')
+    f.clickSubmit()  
+    f.assertBorderColor(f.elements.userNumber,'rgb(220, 53, 69)')    
   })
 })
